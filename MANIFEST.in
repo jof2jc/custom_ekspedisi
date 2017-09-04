@@ -1,0 +1,18 @@
+include MANIFEST.in
+include requirements.txt
+include *.json
+include *.md
+include *.py
+include *.txt
+recursive-include custom_ekspedisi *.css
+recursive-include custom_ekspedisi *.csv
+recursive-include custom_ekspedisi *.html
+recursive-include custom_ekspedisi *.ico
+recursive-include custom_ekspedisi *.js
+recursive-include custom_ekspedisi *.json
+recursive-include custom_ekspedisi *.md
+recursive-include custom_ekspedisi *.png
+recursive-include custom_ekspedisi *.py
+recursive-include custom_ekspedisi *.svg
+recursive-include custom_ekspedisi *.txt
+recursive-exclude custom_ekspedisi *.pyc
