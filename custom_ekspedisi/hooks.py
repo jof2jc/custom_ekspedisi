@@ -91,6 +91,10 @@ doc_events = {
         "on_update_after_submit": "custom_ekspedisi.custom_ekspedisi.custom_ekspedisi.set_delivery_status_bkk_invoice",
 	"on_submit": "custom_ekspedisi.custom_ekspedisi.custom_ekspedisi.set_delivery_status_bkk_invoice",
 	"on_cancel": "custom_ekspedisi.custom_ekspedisi.custom_ekspedisi.set_delivery_status_bkk_invoice"
+    },
+    "Sales Invoice": {
+	"on_submit": "custom_ekspedisi.custom_ekspedisi.custom_ekspedisi.set_delivery_status_per_billed",
+	"on_cancel": "custom_ekspedisi.custom_ekspedisi.custom_ekspedisi.set_delivery_status_per_billed"
     }
 }
 
