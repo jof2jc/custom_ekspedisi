@@ -4,12 +4,32 @@
 from __future__ import unicode_literals
 import frappe
 from frappe import _
-from frappe.utils import flt, cstr
 from frappe.desk.reportview import get_match_cond, get_filters_cond
 from frappe.utils import nowdate
 from collections import defaultdict
+from frappe.model.naming import make_autoname
+from frappe.utils import nowdate, now_datetime, flt, cstr, formatdate, get_datetime, add_days, getdate
 
 # test_records = frappe.get_test_records('testdoctype')
+
+@frappe.whitelist()
+def set_autoname(doc, method):
+	if "set_autoname_based_on_posting_date" in frappe.db.get_table_columns("Company") and not doc.amended_from:
+		if frappe.db.get_value("Company",doc.company,"set_autoname_based_on_posting_date"):
+			_month = getdate(doc.posting_date).strftime('%m')
+			_year = getdate(doc.posting_date).strftime('%y')
+			
+			if doc.doctype == "Journal Entry":
+				_series = cstr(doc.naming_series).replace("MM",_month).replace("YY",_year)
+			elif doc.doctype == "Delivery Note" and not doc.no_do:
+				_series = cstr(doc.naming_series).replace("MM",_month).replace("YY",_year)
+			else:
+				_series = cstr(doc.naming_series).replace("MM",_month).replace("YY",_year).replace("no_do.",doc.no_do)
+			
+			#if not doc.is_return:
+			#	doc.name = make_autoname("INV/." + _year + "./." + _month + "./.###")
+			#else:
+			doc.name = make_autoname(_series)
 
 def get_delivery_notes_to_be_billed(doctype, txt, searchfield, start, page_len, filters, as_dict):
 	return frappe.db.sql("""
@@ -34,17 +54,17 @@ def get_delivery_notes_to_be_billed(doctype, txt, searchfield, start, page_len, 
 	}, {"txt": ("%%%s%%" % txt)}, as_dict=as_dict)
 
 def set_delivery_status_bkk_invoice(self, method):
-	if self.bkk_invoice:
-		pi = frappe.get_doc("Purchase Invoice", self.bkk_invoice)
+	if self.voucher_bkk:
+		jv = frappe.get_doc("Journal Entry", self.voucher_bkk)
 
 		if self.docstatus == 1:
-			pi.delivery_status = "Delivered"
+			jv.delivery_note = self.name
 		elif self.docstatus == 2:
-			pi.delivery_status = "Not Set"
+			jv.delivery_note = ""
 
 		#frappe.throw(_("Status: {0}").format(pi.delivery_status))
 
-		pi.save()
+		jv.save()
 
 def set_delivery_status_per_billed(self, method):
 	if self.docstatus == 1 or self.docstatus == 2:
